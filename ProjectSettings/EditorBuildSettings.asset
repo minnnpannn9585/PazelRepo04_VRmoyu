@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/FunctionTest.unity
-    guid: 754888de01147024d98b386684407cec
+    path: Assets/QA_Office/Demo scene/QA_Office_demoScene_Level_01_Office.unity
+    guid: 48425890b1617a849b14abab954606a4
   m_configObjects:
     Unity.XR.PXR.Settings: {fileID: 11400000, guid: 064305fff34b11f4eb4df159b42cb8f1,
       type: 2}
