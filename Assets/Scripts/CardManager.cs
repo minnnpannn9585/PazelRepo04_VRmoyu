@@ -7,7 +7,13 @@ public class CardManager : MonoBehaviour
 {
     public static CardManager Instance;
     public List<CardSlot> allSlots;
-    
+    public bool canExplode = false;
+
+    // new: control explosion behavior and force range
+    public float minExplodeForce = 300f;
+    public float maxExplodeForce = 700f;
+    private bool hasExploded = false;
+
     private void Awake()
     {
         if (Instance == null)
@@ -19,7 +25,45 @@ public class CardManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
+    private void Update()
+    {
+        if (canExplode && !hasExploded)
+        {
+            for(int i = 0; i < allSlots.Count; i++)
+            {
+
+                Rigidbody rb = allSlots[i].OccupyingCard.GetComponent<Rigidbody>();
+                rb.isKinematic = false;
+                rb.useGravity = true;
+
+                var slot = allSlots[i];
+                var card = slot.OccupyingCard;
+                // unparent so physics acts in world space
+                card.transform.SetParent(null);
+
+                rb.isKinematic = false;
+                rb.useGravity = true;
+
+                // create a randomized direction:
+                // base direction is outward from this manager's position to the card,
+                // then add some random spread so force isn't perfectly radial.
+                Vector3 baseDir = (card.transform.position - transform.position).normalized;
+                Vector3 randomSpread = Random.insideUnitSphere * 0.6f;
+                // Optionally reduce downward pushes so cards don't immediately bury into floor:
+                randomSpread.y = Mathf.Clamp(randomSpread.y, -0.2f, 1f);
+
+                Vector3 explodeDirection = (baseDir + randomSpread).normalized;
+
+                float force = Random.Range(minExplodeForce, maxExplodeForce);
+                rb.AddForce(explodeDirection * force, ForceMode.Impulse);
+            }
+
+            // ensure explosion only happens once per trigger
+            hasExploded = true;
+        }
+    }
+
     public void CheckCompletion()
     {
         bool allFilled = true;
@@ -37,7 +81,7 @@ public class CardManager : MonoBehaviour
         // if all filled, get the puzzle result
         if (allFilled)
         {
-            //can break cards
+            canExplode = true;
         }
     }
 }

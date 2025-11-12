@@ -8,6 +8,13 @@ public class Card : MonoBehaviour
     private XRGrabInteractable grabInteractable;
     private Rigidbody rb;
     private CardSlot currentSlot;
+    private void Awake()
+    {
+        // Ensure these components are available to avoid NullReferenceExceptions
+        grabInteractable = GetComponent<XRGrabInteractable>();
+        rb = GetComponent<Rigidbody>();
+    }
+
     public void SnapToSlot(CardSlot slot)
     {
         if (currentSlot != null)
@@ -36,7 +43,7 @@ public class Card : MonoBehaviour
             if (slot.OccupyingCard == null)
             {
                 SnapToSlot(slot);
-                other.GetComponent<MeshRenderer>().enabled = false;
+                other.transform.GetChild(0).gameObject.SetActive(false);
                 CardManager.Instance.CheckCompletion();
             }
         }
